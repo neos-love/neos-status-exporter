@@ -60,11 +60,33 @@ const formatData = (data) => {
     }
 }
 
-const makeGaugeText = (name, data) => {
-    return `# HELP neos_${name} neos ${name} value
-# TYPE neos_${name} gauge
-neos_${name} ${data}`
+const makeGaugeText = (data) => {
+    return `# HELP neos_capture_timestamp neos capture_timestamp value
+# TYPE neos_capture_timestamp gauge
+neos_capture_timestamp ${data.captureTimestamp}
+# HELP neos_registered_users neos registered_users value
+# TYPE neos_registered_users gauge
+neos_registered_users ${data.registeredUserCount}
+# HELP neos_instances neos instances value
+# TYPE neos_instances gauge
+neos_instances ${data.instanceCount}
+# HELP neos_online_users online neos users value
+# TYPE neos_online_users gauge
+neos_online_users{device="vr"} ${data.vrUserCount}
+neos_online_users{device="screen"} ${data.screenUserCount}
+neos_online_users{device="headless"} ${data.headlessUserCount}
+neos_online_users{device="mobile"} ${data.mobileUserCount}
+# HELP neos_public_sessions neos public_sessions value
+# TYPE neos_public_sessions gauge
+neos_public_sessions ${data.publicSessionCount}
+# HELP neos_active_public_sessions neos active_public_sessions value
+# TYPE neos_active_public_sessions gauge
+neos_active_public_sessions ${data.activePublicSessionCount}
+# HELP neos_public_world_users neos public_world_users value
+# TYPE neos_public_world_users gauge
+neos_public_world_users ${data.publicWorldUserCount}`
 }
+
 
 const nameMap = {
     captureTimestamp: "capture_timestamp",
@@ -81,7 +103,7 @@ const nameMap = {
 
 const updateData = async () => {
     const data = await getStatus()
-    cache = Object.entries(data).map(([name, data]) => makeGaugeText(nameMap[name], data)).join("\n")
+    cache = makeGaugeText(data)
 }
 await updateData()
 setInterval(async () => await updateData() , 60 * 1000)
