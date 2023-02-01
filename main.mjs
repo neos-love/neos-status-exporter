@@ -66,9 +66,22 @@ const makeGaugeText = (name, data) => {
 neos_${name} ${data}`
 }
 
+const nameMap = {
+    captureTimestamp: "capture_timestamp",
+    registeredUserCount: "registered_users",
+    instanceCount: "instances",
+    vrUserCount: "users{device=\"vr\"}",
+    screenUserCount: "users{device=\"screen\"}",
+    headlessUserCount: "users{device=\"headless\"}",
+    mobileUserCount: "users{device=\"mobile\"}",
+    publicSessionCount: "public_sessions",
+    activePublicSessionCount: "active_public_sessions",
+    publicWorldUserCount: "public_world_users"
+}
+
 const updateData = async () => {
     const data = await getStatus()
-    cache = Object.entries(data).map(([name, data]) => makeGaugeText(name, data)).join("\n")
+    cache = Object.entries(data).map(([name, data]) => makeGaugeText(nameMap[name], data)).join("\n")
 }
 await updateData()
 setInterval(async () => await updateData() , 60 * 1000)
