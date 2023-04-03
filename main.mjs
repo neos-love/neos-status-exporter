@@ -1,8 +1,7 @@
 import axios from "axios";
 import express from "express";
-import fs from "fs/promises"
 
-const API_ENDPOINT = "https://api.neos.com/api/stats/onlineUserStats"
+const API_ENDPOINT = "https://cloudx.azurewebsites.net/api/stats/onlineUserStats"
 
 let cache = ""
 
