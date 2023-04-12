@@ -1,12 +1,15 @@
 import axios from "axios";
 import express from "express";
 
+// NeosのUserStatus APIエンドポイント
 const API_ENDPOINT = "https://cloudx.azurewebsites.net/api/stats/onlineUserStats"
 
 let cache = ""
 
 const app = express()
 app.listen(3000, () => {console.log("OK 3000")})
+
+// prometheus用エンドポイント
 app.get("*", async (req, res) => {
     res.header('Content-Type', 'text/plain;charset=utf-8');
     return res.send(cache)
@@ -15,6 +18,7 @@ app.get("*", async (req, res) => {
 const getStatus = async () => {
     try {
         /**
+         * response example
          * {
          *     "captureTimestamp": "2023-01-28T11:38:39.1834105Z",
          *     "registeredUserCount": 333,
@@ -59,6 +63,7 @@ const formatData = (data) => {
     }
 }
 
+// prometheus用テキスト作成
 const makeGaugeText = (data) => {
     return `# HELP neos_capture_timestamp neos capture_timestamp value
 # TYPE neos_capture_timestamp gauge
@@ -86,25 +91,16 @@ neos_active_public_sessions ${data.activePublicSessionCount}
 neos_public_world_users ${data.publicWorldUserCount}`
 }
 
-
-const nameMap = {
-    captureTimestamp: "capture_timestamp",
-    registeredUserCount: "registered_users",
-    instanceCount: "instances",
-    vrUserCount: "users{device=\"vr\"}",
-    screenUserCount: "users{device=\"screen\"}",
-    headlessUserCount: "users{device=\"headless\"}",
-    mobileUserCount: "users{device=\"mobile\"}",
-    publicSessionCount: "public_sessions",
-    activePublicSessionCount: "active_public_sessions",
-    publicWorldUserCount: "public_world_users"
-}
-
+// キャッシュ更新
 const updateData = async () => {
     const data = await getStatus()
     cache = makeGaugeText(data)
 }
+
+// 初回取得
 await updateData()
+
+// 1分に1回更新
 setInterval(async () => await updateData() , 60 * 1000)
 
 
