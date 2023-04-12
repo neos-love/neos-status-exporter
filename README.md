@@ -19,7 +19,7 @@ npm install
 npm start
 ```
 
-## Prometheusで収集する方法
+## Prometheus設定
 Prometheusの設定ファイルに以下のように記述します。
 ```
 scrape_configs:
